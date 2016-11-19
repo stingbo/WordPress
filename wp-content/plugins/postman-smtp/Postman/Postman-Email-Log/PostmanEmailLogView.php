@@ -325,7 +325,8 @@ class PostmanEmailLogView extends WP_List_Table {
 		$posts = get_posts ( $args );
 		foreach ( $posts as $post ) {
 			$date = $post->post_date;
-			$humanTime = human_time_diff ( strtotime ( $post->post_date_gmt ) );
+			//$humanTime = human_time_diff ( strtotime ( $post->post_date_gmt ) );
+			$humanTime = human_time_diff ( strtotime ( $date ) );
 			// if this PHP system support humanTime, than use it
 			if (! empty ( $humanTime )) {
 				/* Translators: where %s indicates the relative time from now */
