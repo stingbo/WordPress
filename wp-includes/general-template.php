@@ -994,7 +994,7 @@ function wp_get_document_title() {
 
 	// If on a category or tag archive, use the term title.
 	} elseif ( is_category() || is_tag() ) {
-		$title['title'] = single_term_title( '', false );
+        $title['title'] = single_term_title( '', false );
 
 	// If on an author archive, use the author's display name.
 	} elseif ( is_author() && $author = get_queried_object() ) {
@@ -1054,7 +1054,7 @@ function wp_get_document_title() {
 	$title = esc_html( $title );
 	$title = capital_P_dangit( $title );
 
-	return $title;
+    return $title;
 }
 
 /**
@@ -1461,15 +1461,15 @@ function the_archive_title( $before = '', $after = '' ) {
  */
 function get_the_archive_title() {
 	if ( is_category() ) {
-		$title = sprintf( __( 'Category: %s' ), single_cat_title( '', false ) );
+        $title = sprintf( __( '分类: %s' ), single_cat_title( '', false ) );
 	} elseif ( is_tag() ) {
-		$title = sprintf( __( 'Tag: %s' ), single_tag_title( '', false ) );
+		$title = sprintf( __( '标签: %s' ), single_tag_title( '', false ) );
 	} elseif ( is_author() ) {
-		$title = sprintf( __( 'Author: %s' ), '<span class="vcard">' . get_the_author() . '</span>' );
+		$title = sprintf( __( '作者: %s' ), '<span class="vcard">' . get_the_author() . '</span>' );
 	} elseif ( is_year() ) {
 		$title = sprintf( __( 'Year: %s' ), get_the_date( _x( 'Y', 'yearly archives date format' ) ) );
 	} elseif ( is_month() ) {
-		$title = sprintf( __( 'Month: %s' ), get_the_date( _x( 'F Y', 'monthly archives date format' ) ) );
+		$title = sprintf( __( '日期: %s' ), get_the_date( _x( 'F Y', 'monthly archives date format' ) ) );
 	} elseif ( is_day() ) {
 		$title = sprintf( __( 'Day: %s' ), get_the_date( _x( 'F j, Y', 'daily archives date format' ) ) );
 	} elseif ( is_tax( 'post_format' ) ) {

@@ -46,7 +46,8 @@ class WP_Widget_Archives extends WP_Widget {
 		$d = ! empty( $instance['dropdown'] ) ? '1' : '0';
 
 		/** This filter is documented in wp-includes/widgets/class-wp-widget-pages.php */
-		$title = apply_filters( 'widget_title', empty( $instance['title'] ) ? __( 'Archives' ) : $instance['title'], $instance, $this->id_base );
+		//$title = apply_filters( 'widget_title', empty( $instance['title'] ) ? __( 'Archives' ) : $instance['title'], $instance, $this->id_base );
+		$title = apply_filters( 'widget_title', empty( $instance['title'] ) ? __( '日期存档' ) : $instance['title'], $instance, $this->id_base );
 
 		echo $args['before_widget'];
 		if ( $title ) {
