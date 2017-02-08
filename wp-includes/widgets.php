@@ -1454,7 +1454,7 @@ function wp_widgets_init() {
 
 	register_widget('WP_Widget_Text');
 
-	register_widget('WP_Widget_Categories');
+    register_widget('WP_Widget_Categories');
 
 	register_widget('WP_Widget_Recent_Posts');
 

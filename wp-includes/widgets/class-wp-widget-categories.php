@@ -24,11 +24,11 @@ class WP_Widget_Categories extends WP_Widget {
 	 */
 	public function __construct() {
 		$widget_ops = array(
-			'classname' => 'widget_categories',
+            'classname' => 'widget_categories',
 			'description' => __( 'A list or dropdown of categories.' ),
 			'customize_selective_refresh' => true,
 		);
-		parent::__construct( 'categories', __( 'Categories' ), $widget_ops );
+        parent::__construct( 'categories', __( 'Categories' ), $widget_ops );
 	}
 
 	/**
@@ -45,13 +45,14 @@ class WP_Widget_Categories extends WP_Widget {
 		static $first_dropdown = true;
 
 		/** This filter is documented in wp-includes/widgets/class-wp-widget-pages.php */
-		$title = apply_filters( 'widget_title', empty( $instance['title'] ) ? __( 'Categories' ) : $instance['title'], $instance, $this->id_base );
+        //$title = apply_filters( 'widget_title', empty( $instance['title'] ) ? __( 'Categoriesss' ) : $instance['title'], $instance, $this->id_base );
+        $title = apply_filters( 'widget_title', empty( $instance['title'] ) ? __( '分类' ) : $instance['title'], $instance, $this->id_base );
 
 		$c = ! empty( $instance['count'] ) ? '1' : '0';
 		$h = ! empty( $instance['hierarchical'] ) ? '1' : '0';
 		$d = ! empty( $instance['dropdown'] ) ? '1' : '0';
 
-		echo $args['before_widget'];
+        echo $args['before_widget'];
 		if ( $title ) {
 			echo $args['before_title'] . $title . $args['after_title'];
 		}
