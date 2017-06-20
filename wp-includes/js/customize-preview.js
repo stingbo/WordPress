@@ -49,14 +49,14 @@
 		history.replaceState = ( function( nativeReplaceState ) {
 			return function historyReplaceState( data, title, url ) {
 				currentHistoryState = data;
-				return nativeReplaceState.call( history, data, title, injectUrlWithState( url ) );
+				return nativeReplaceState.call( history, data, title, 'string' === typeof url && url.length > 0 ? injectUrlWithState( url ) : url );
 			};
 		} )( history.replaceState );
 
 		history.pushState = ( function( nativePushState ) {
 			return function historyPushState( data, title, url ) {
 				currentHistoryState = data;
-				return nativePushState.call( history, data, title, injectUrlWithState( url ) );
+				return nativePushState.call( history, data, title, 'string' === typeof url && url.length > 0 ? injectUrlWithState( url ) : url );
 			};
 		} )( history.pushState );
 
@@ -106,18 +106,18 @@
 			preview.add( 'scheme', urlParser.protocol.replace( /:$/, '' ) );
 
 			preview.body = $( document.body );
-
-			preview.body.on( 'click.preview', 'a', function( event ) {
-				preview.handleLinkClick( event );
-			} );
-
-			preview.body.on( 'submit.preview', 'form', function( event ) {
-				preview.handleFormSubmit( event );
-			} );
-
 			preview.window = $( window );
 
 			if ( api.settings.channel ) {
+
+				// If in an iframe, then intercept the link clicks and form submissions.
+				preview.body.on( 'click.preview', 'a', function( event ) {
+					preview.handleLinkClick( event );
+				} );
+				preview.body.on( 'submit.preview', 'form', function( event ) {
+					preview.handleFormSubmit( event );
+				} );
+
 				preview.window.on( 'scroll.preview', debounce( function() {
 					preview.send( 'scroll', preview.window.scrollTop() );
 				}, 200 ) );
@@ -132,22 +132,22 @@
 		 * Handle link clicks in preview.
 		 *
 		 * @since 4.7.0
+		 * @access public
 		 *
 		 * @param {jQuery.Event} event Event.
 		 */
 		handleLinkClick: function( event ) {
 			var preview = this, link, isInternalJumpLink;
-			link = $( event.target );
+			link = $( event.target ).closest( 'a' );
 
 			// No-op if the anchor is not a link.
 			if ( _.isUndefined( link.attr( 'href' ) ) ) {
 				return;
 			}
 
+			// Allow internal jump links and JS links to behave normally without preventing default.
 			isInternalJumpLink = ( '#' === link.attr( 'href' ).substr( 0, 1 ) );
-
-			// Allow internal jump links to behave normally without preventing default.
-			if ( isInternalJumpLink ) {
+			if ( isInternalJumpLink || ! /^https?:$/.test( link.prop( 'protocol' ) ) ) {
 				return;
 			}
 
@@ -155,11 +155,6 @@
 			if ( ! api.isLinkPreviewable( link[0] ) ) {
 				wp.a11y.speak( api.settings.l10n.linkUnpreviewable );
 				event.preventDefault();
-				return;
-			}
-
-			// If not in an iframe, then allow the link click to proceed normally since the state query params are added.
-			if ( ! api.settings.channel ) {
 				return;
 			}
 
@@ -183,6 +178,7 @@
 		 * Handle form submit.
 		 *
 		 * @since 4.7.0
+		 * @access public
 		 *
 		 * @param {jQuery.Event} event Event.
 		 */
@@ -196,11 +192,6 @@
 			if ( 'GET' !== form.prop( 'method' ).toUpperCase() || ! api.isLinkPreviewable( urlParser ) ) {
 				wp.a11y.speak( api.settings.l10n.formUnpreviewable );
 				event.preventDefault();
-				return;
-			}
-
-			// If not in an iframe, then allow the form submission to proceed normally with the state inputs injected.
-			if ( ! api.settings.channel ) {
 				return;
 			}
 
@@ -282,7 +273,7 @@
 	 * @returns {boolean} Is appropriate for changeset link.
 	 */
 	api.isLinkPreviewable = function isLinkPreviewable( element, options ) {
-		var matchesAllowedUrl, parsedAllowedUrl, args;
+		var matchesAllowedUrl, parsedAllowedUrl, args, elementHost;
 
 		args = _.extend( {}, { allowAdminAjax: false }, options || {} );
 
@@ -295,10 +286,11 @@
 			return false;
 		}
 
+		elementHost = element.host.replace( /:(80|443)$/, '' );
 		parsedAllowedUrl = document.createElement( 'a' );
 		matchesAllowedUrl = ! _.isUndefined( _.find( api.settings.url.allowed, function( allowedUrl ) {
 			parsedAllowedUrl.href = allowedUrl;
-			return parsedAllowedUrl.protocol === element.protocol && parsedAllowedUrl.host === element.host && 0 === element.pathname.indexOf( parsedAllowedUrl.pathname.replace( /\/$/, '' ) );
+			return parsedAllowedUrl.protocol === element.protocol && parsedAllowedUrl.host.replace( /:(80|443)$/, '' ) === elementHost && 0 === element.pathname.indexOf( parsedAllowedUrl.pathname.replace( /\/$/, '' ) );
 		} ) );
 		if ( ! matchesAllowedUrl ) {
 			return false;
@@ -342,18 +334,22 @@
 			return;
 		}
 
-		// Ignore links with href="#" or href="#id".
-		if ( '#' === $( element ).attr( 'href' ).substr( 0, 1 ) ) {
+		// Ignore links with href="#", href="#id", or non-HTTP protocols (e.g. javascript: and mailto:).
+		if ( '#' === $( element ).attr( 'href' ).substr( 0, 1 ) || ! /^https?:$/.test( element.protocol ) ) {
 			return;
 		}
 
 		// Make sure links in preview use HTTPS if parent frame uses HTTPS.
-		if ( 'https' === api.preview.scheme.get() && 'http:' === element.protocol && -1 !== api.settings.url.allowedHosts.indexOf( element.host ) ) {
+		if ( api.settings.channel && 'https' === api.preview.scheme.get() && 'http:' === element.protocol && -1 !== api.settings.url.allowedHosts.indexOf( element.host ) ) {
 			element.protocol = 'https:';
 		}
 
 		if ( ! api.isLinkPreviewable( element ) ) {
-			$( element ).addClass( 'customize-unpreviewable' );
+
+			// Style link as unpreviewable only if previewing in iframe; if previewing on frontend, links will be allowed to work normally.
+			if ( api.settings.channel ) {
+				$( element ).addClass( 'customize-unpreviewable' );
+			}
 			return;
 		}
 		$( element ).removeClass( 'customize-unpreviewable' );
@@ -496,13 +492,17 @@
 		urlParser.href = form.action;
 
 		// Make sure forms in preview use HTTPS if parent frame uses HTTPS.
-		if ( 'https' === api.preview.scheme.get() && 'http:' === urlParser.protocol && -1 !== api.settings.url.allowedHosts.indexOf( urlParser.host ) ) {
+		if ( api.settings.channel && 'https' === api.preview.scheme.get() && 'http:' === urlParser.protocol && -1 !== api.settings.url.allowedHosts.indexOf( urlParser.host ) ) {
 			urlParser.protocol = 'https:';
 			form.action = urlParser.href;
 		}
 
 		if ( 'GET' !== form.method.toUpperCase() || ! api.isLinkPreviewable( urlParser ) ) {
-			$( form ).addClass( 'customize-unpreviewable' );
+
+			// Style form as unpreviewable only if previewing in iframe; if previewing on frontend, all forms will be allowed to work normally.
+			if ( api.settings.channel ) {
+				$( form ).addClass( 'customize-unpreviewable' );
+			}
 			return;
 		}
 		$( form ).removeClass( 'customize-unpreviewable' );

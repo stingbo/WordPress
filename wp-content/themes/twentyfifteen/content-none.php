@@ -12,7 +12,7 @@
 
 <section class="no-results not-found">
 	<header class="page-header">
-		<h1 class="page-title"><?php _e( '什么也没有呢！', 'twentyfifteen' ); ?></h1>
+		<h1 class="page-title"><?php _e( 'Nothing Found', 'twentyfifteen' ); ?></h1>
 	</header><!-- .page-header -->
 
 	<div class="page-content">
@@ -23,7 +23,7 @@
 
 		<?php elseif ( is_search() ) : ?>
 
-			<p><?php _e( '抱歉, 没有找到匹配的内容. 请尝试其它的关键词.', 'twentyfifteen' ); ?></p>
+			<p><?php _e( 'Sorry, but nothing matched your search terms. Please try again with some different keywords.', 'twentyfifteen' ); ?></p>
 			<?php get_search_form(); ?>
 
 		<?php else : ?>

@@ -21,10 +21,9 @@ final class WP_Customize_Custom_CSS_Setting extends WP_Customize_Setting {
 	/**
 	 * The setting type.
 	 *
-	 * @var string
-	 *
 	 * @since 4.7.0
 	 * @access public
+	 * @var string
 	 */
 	public $type = 'custom_css';
 
@@ -33,7 +32,6 @@ final class WP_Customize_Custom_CSS_Setting extends WP_Customize_Setting {
 	 *
 	 * @since 4.7.0
 	 * @access public
-	 *
 	 * @var string
 	 */
 	public $transport = 'postMessage';
@@ -43,7 +41,6 @@ final class WP_Customize_Custom_CSS_Setting extends WP_Customize_Setting {
 	 *
 	 * @since 4.7.0
 	 * @access public
-	 *
 	 * @var string
 	 */
 	public $capability = 'edit_css';
@@ -53,7 +50,6 @@ final class WP_Customize_Custom_CSS_Setting extends WP_Customize_Setting {
 	 *
 	 * @since 4.7.0
 	 * @access public
-	 *
 	 * @var string
 	 */
 	public $stylesheet = '';
@@ -132,10 +128,13 @@ final class WP_Customize_Custom_CSS_Setting extends WP_Customize_Setting {
 	 * @return string
 	 */
 	public function value() {
-		$id_base = $this->id_data['base'];
-		if ( $this->is_previewed && null !== $this->post_value( null ) ) {
-			return $this->post_value();
+		if ( $this->is_previewed ) {
+			$post_value = $this->post_value( null );
+			if ( null !== $post_value ) {
+				return $post_value;
+			}
 		}
+		$id_base = $this->id_data['base'];
 		$value = '';
 		$post = wp_get_custom_css_post( $this->stylesheet );
 		if ( $post ) {
@@ -176,31 +175,47 @@ final class WP_Customize_Custom_CSS_Setting extends WP_Customize_Setting {
 
 		// Make sure that there is a closing brace for each opening brace.
 		if ( ! $this->validate_balanced_characters( '{', '}', $css ) ) {
-			$validity->add( 'imbalanced_curly_brackets', __( 'Your curly brackets <code>{}</code> are imbalanced. Make sure there is a closing <code>}</code> for every opening <code>{</code>.' ) );
+			$validity->add( 'imbalanced_curly_brackets', sprintf(
+				/* translators: 1: {}, 2: }, 3: { */
+				__( 'Your curly brackets %1$s are imbalanced. Make sure there is a closing %2$s for every opening %3$s.' ),
+				'<code>{}</code>',
+				'<code>}</code>',
+				'<code>{</code>'
+			) );
 			$imbalanced = true;
 		}
 
 		// Ensure brackets are balanced.
 		if ( ! $this->validate_balanced_characters( '[', ']', $css ) ) {
-			$validity->add( 'imbalanced_braces', __( 'Your brackets <code>[]</code> are imbalanced. Make sure there is a closing <code>]</code> for every opening <code>[</code>.' ) );
+			$validity->add( 'imbalanced_braces', sprintf(
+				/* translators: 1: [], 2: ], 3: [ */
+				__( 'Your brackets %1$s are imbalanced. Make sure there is a closing %2$s for every opening %3$s.' ),
+				'<code>[]</code>',
+				'<code>]</code>',
+				'<code>[</code>'
+			) );
 			$imbalanced = true;
 		}
 
 		// Ensure parentheses are balanced.
 		if ( ! $this->validate_balanced_characters( '(', ')', $css ) ) {
-			$validity->add( 'imbalanced_parentheses', __( 'Your parentheses <code>()</code> are imbalanced. Make sure there is a closing <code>)</code> for every opening <code>(</code>.' ) );
+			$validity->add( 'imbalanced_parentheses', sprintf(
+				/* translators: 1: (), 2: ), 3: ( */
+				__( 'Your parentheses %1$s are imbalanced. Make sure there is a closing %2$s for every opening %3$s.' ),
+				'<code>()</code>',
+				'<code>)</code>',
+				'<code>(</code>'
+			) );
 			$imbalanced = true;
 		}
 
-		// Ensure single quotes are equal.
-		if ( ! $this->validate_equal_characters( '\'', $css ) ) {
-			$validity->add( 'unequal_single_quotes', __( 'Your single quotes <code>\'</code> are uneven. Make sure there is a closing <code>\'</code> for every opening <code>\'</code>.' ) );
-			$imbalanced = true;
-		}
-
-		// Ensure single quotes are equal.
+		// Ensure double quotes are equal.
 		if ( ! $this->validate_equal_characters( '"', $css ) ) {
-			$validity->add( 'unequal_double_quotes', __( 'Your double quotes <code>"</code> are uneven. Make sure there is a closing <code>"</code> for every opening <code>"</code>.' ) );
+			$validity->add( 'unequal_double_quotes', sprintf(
+				/* translators: 1: " (double quote) */
+				__( 'Your double quotes %1$s are uneven. Make sure there is a closing %1$s for every opening %1$s.' ),
+				'<code>"</code>'
+			) );
 			$imbalanced = true;
 		}
 
@@ -216,14 +231,32 @@ final class WP_Customize_Custom_CSS_Setting extends WP_Customize_Setting {
 		 */
 		$unclosed_comment_count = $this->validate_count_unclosed_comments( $css );
 		if ( 0 < $unclosed_comment_count ) {
-			$validity->add( 'unclosed_comment', sprintf( _n( 'There is %s unclosed code comment. Close each comment with <code>*/</code>.', 'There are %s unclosed code comments. Close each comment with <code>*/</code>.', $unclosed_comment_count ), $unclosed_comment_count ) );
+			$validity->add( 'unclosed_comment', sprintf(
+				/* translators: 1: number of unclosed comments, 2: *​/ */
+				_n(
+					'There is %1$s unclosed code comment. Close each comment with %2$s.',
+					'There are %1$s unclosed code comments. Close each comment with %2$s.',
+					$unclosed_comment_count
+				),
+				$unclosed_comment_count,
+				'<code>*/</code>'
+			) );
 			$imbalanced = true;
 		} elseif ( ! $this->validate_balanced_characters( '/*', '*/', $css ) ) {
-			$validity->add( 'imbalanced_comments', __( 'There is an extra <code>*/</code>, indicating an end to a comment.  Be sure that there is an opening <code>/*</code> for every closing <code>*/</code>.' ) );
+			$validity->add( 'imbalanced_comments', sprintf(
+				/* translators: 1: *​/, 2: /​* */
+				__( 'There is an extra %1$s, indicating an end to a comment. Be sure that there is an opening %2$s for every closing %1$s.' ),
+				'<code>*/</code>',
+				'<code>/*</code>'
+			) );
 			$imbalanced = true;
 		}
 		if ( $imbalanced && $this->is_possible_content_error( $css ) ) {
-			$validity->add( 'possible_false_positive', __( 'Imbalanced/unclosed character errors can be caused by <code>content: "";</code> declarations. You may need to remove this or add it to a custom CSS file.' ) );
+			$validity->add( 'possible_false_positive', sprintf(
+				/* translators: %s: content: ""; */
+				__( 'Imbalanced/unclosed character errors can be caused by %s declarations. You may need to remove this or add it to a custom CSS file.' ),
+				'<code>content: "";</code>'
+			) );
 		}
 
 		if ( empty( $validity->errors ) ) {
@@ -242,69 +275,18 @@ final class WP_Customize_Custom_CSS_Setting extends WP_Customize_Setting {
 	 * @return int|false The post ID or false if the value could not be saved.
 	 */
 	public function update( $css ) {
-		$setting = $this;
-
 		if ( empty( $css ) ) {
 			$css = '';
 		}
 
-		$args = array(
-			'post_content' => $css,
-			'post_content_filtered' => '',
-		);
+		$r = wp_update_custom_css_post( $css, array(
+			'stylesheet' => $this->stylesheet,
+		) );
 
-		/**
-		 * Filters the `post_content` and `post_content_filtered` args for a `custom_css` post being updated.
-		 *
-		 * This filter can be used by plugin that offer CSS pre-processors, to store the original
-		 * pre-processed CSS in `post_content_filtered` and then store processed CSS in `post_content`.
-		 * When used in this way, the `post_content_filtered` should be supplied as the setting value
-		 * instead of `post_content` via a the `customize_value_custom_css` filter, for example:
-		 *
-		 * <code>
-		 * add_filter( 'customize_value_custom_css', function( $value, $setting ) {
-		 *     $post = wp_get_custom_css_post( $setting->stylesheet );
-		 *     if ( $post && ! empty( $post->post_content_filtered ) ) {
-		 *         $css = $post->post_content_filtered;
-		 *     }
-		 *     return $css;
-		 * }, 10, 2 );
-		 * </code>
-		 *
-		 * @since 4.7.0
-		 * @param array  $args {
-		 *     Content post args (unslashed) for `wp_update_post()`/`wp_insert_post()`.
-		 *
-		 *     @type string $post_content          CSS.
-		 *     @type string $post_content_filtered Pre-processed CSS. Normally empty string.
-		 * }
-		 * @param string                          $css     Original CSS being updated.
-		 * @param WP_Customize_Custom_CSS_Setting $setting Custom CSS Setting.
-		 */
-		$args = apply_filters( 'customize_update_custom_css_post_content_args', $args, $css, $setting );
-		$args = wp_array_slice_assoc( $args, array( 'post_content', 'post_content_filtered' ) );
-
-		$args = array_merge(
-			$args,
-			array(
-				'post_title' => $this->stylesheet,
-				'post_name' => sanitize_title( $this->stylesheet ),
-				'post_type' => 'custom_css',
-				'post_status' => 'publish',
-			)
-		);
-
-		// Update post if it already exists, otherwise create a new one.
-		$post = wp_get_custom_css_post( $this->stylesheet );
-		if ( $post ) {
-			$args['ID'] = $post->ID;
-			$post_id = wp_update_post( wp_slash( $args ) );
-		} else {
-			$post_id = wp_insert_post( wp_slash( $args ) );
-		}
-		if ( ! $post_id ) {
+		if ( $r instanceof WP_Error ) {
 			return false;
 		}
+		$post_id = $r->ID;
 
 		// Cache post ID in theme mod for performance to avoid additional DB query.
 		if ( $this->manager->get_stylesheet() === $this->stylesheet ) {
