@@ -405,3 +405,33 @@ require get_template_directory() . '/inc/template-tags.php';
  * @since Twenty Fifteen 1.0
  */
 require get_template_directory() . '/inc/customizer.php';
+
+// WordPress禁止全英文，不包括汉字的评论
+function refused_spam_comments( $comment_data ) {
+    $pattern = '/[一-龥]/u';
+    if(!preg_match($pattern,$comment_data['comment_content'])) {
+        wp_die('对不起，评论提交失败。评论中必须含中文!');
+    }
+    return( $comment_data );
+}
+add_filter('preprocess_comment','refused_spam_comments');
+
+// WordPress禁止日文评论
+function BYMT_comment_jp_post( $incoming_comment ) {
+    $jpattern ='/[ぁ-ん]+|[ァ-ヴ]+/u';
+    if(preg_match($jpattern, $incoming_comment['comment_content'])){
+        wp_die( "对不起，评论提交失败。评论中禁止发日文字符！" );
+    }
+    return( $incoming_comment );
+}
+add_filter('preprocess_comment', 'BYMT_comment_jp_post');
+
+//Wordpress评论禁止发链接地址
+function lianyue_comment_post( $incoming_comment ) {
+    $http = '/[href="|rel="nofollow"|http:\/\/|<\/a>]/u';
+    if(preg_match($http, $incoming_comment['comment_content'])) {
+        wp_die( "对不起，评论提交失败。评论中禁止发链接地址！" );
+    }
+    return( $incoming_comment );
+}
+//add_filter('preprocess_comment', 'lianyue_comment_post');
