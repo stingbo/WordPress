@@ -74,13 +74,13 @@ class WP_Widget_Meta extends WP_Widget {
             */
             echo apply_filters( 'widget_meta_poweredby', sprintf( '<li><a href="%s" title="%s">%s</a></li>',
                 esc_url( __( 'http://www.tudouhaitao.com/' ) ),
-                esc_attr__( 'Powered by WordPress, state-of-the-art semantic personal publishing platform.' ),
+                esc_attr__( 'Powered by BoBo, 个人项目DEMO演示.' ),
                 _x( '土豆海淘', 'meta widget link text' )
             ) );
 
-            echo '有问题可以联系博主，联系方式:<br />';
-            echo '个人邮箱:sting_bo@163.com<br />';
-            echo '个人微信二维码:<br />';
+            echo '有问题可以联系博主，联系方式:<br>';
+            echo '个人邮箱:<a href="mailto:sting_bo@163.com">sting_bo@163.com</a><br>';
+            echo '个人微信二维码:<br>';
             echo "<image style='border: solid; border-radius: 15px;' alt='sting_bo个人微信号' title='sting_bo个人微信号' src='http://blog.blianb.com/wp-content/uploads/2017/06/wechat_qrcode.png'>";
 
 
