@@ -22,7 +22,7 @@
 				 */
 				do_action( 'twentyfifteen_credits' );
 			?>
-			<a href="<?php echo esc_url( __( 'https://wordpress.org/', 'twentyfifteen' ) ); ?>"><?php printf( __( 'Proudly powered by %s', 'twentyfifteen' ), 'WordPress' ); ?></a>
+			<a href="<?php echo esc_url( __( 'http://blog.blianb.com', '波波' ) ); ?>"><?php printf( __( 'Proudly powered by %s', '波波' ), '波波' ); ?></a>
 		</div><!-- .site-info -->
 	</footer><!-- .site-footer -->
 
@@ -31,4 +31,7 @@
 <?php wp_footer(); ?>
 
 </body>
+<script type="text/javascript">
+var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1270361873'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s13.cnzz.com/z_stat.php%3Fid%3D1270361873%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+</script>
 </html>
