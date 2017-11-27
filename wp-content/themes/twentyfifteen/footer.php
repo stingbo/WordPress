@@ -22,7 +22,7 @@
 				 */
 				do_action( 'twentyfifteen_credits' );
 			?>
-			<a href="<?php echo esc_url( __( 'http://blog.blianb.com', '波波' ) ); ?>"><?php printf( __( 'Proudly powered by %s', '波波' ), '波波' ); ?></a>
+			<a href="<?php echo esc_url( __( 'http://blog.blianb.com', '波波' ) ); ?>"><?php echo '波波的博客'; ?></a>
 		</div><!-- .site-info -->
 	</footer><!-- .site-footer -->
 
