@@ -68,16 +68,16 @@ class WP_Widget_Meta extends WP_Widget {
 			 * @param string $title_text Default title text for the WordPress.org link.
 			 * @param array  $instance   Array of settings for the current widget.
 			 */
-            echo apply_filters( 'widget_meta_poweredby', sprintf( '<li><a href="%s" title="%s">%s</a></li>',
-                esc_url( __( 'http://tudouhaitao.blianb.com/' ) ),
+            echo apply_filters( 'widget_meta_poweredby', sprintf( '<li><a href="%s" title="%s" target="_blank">%s</a></li>',
+                esc_url( __( 'http://www.blianb.com/' ) ),
                 esc_attr__( 'Powered by BoBo, 个人项目DEMO演示.' ),
-                _x( '土豆海淘', 'meta widget link text' )
+                _x( '土豆淘', 'meta widget link text' )
             ), $instance );
 
             echo '有问题可以联系博主，联系方式:<br>';
             echo '个人邮箱:<a href="mailto:sting_bo@163.com">sting_bo@163.com</a><br>';
             echo '个人微信二维码:<br>';
-            echo "<image style='border: solid; border-radius: 15px;' alt='sting_bo个人微信号' title='sting_bo个人微信号' src='http://blog.blianb.com/wp-content/uploads/2017/06/wechat_qrcode.png'>";
+            echo "<image style='border: solid; border-radius: 15px;' alt='sting_bo个人微信号' title='sting_bo个人微信号' src='https://blog.blianb.com/wp-content/uploads/2017/06/wechat_qrcode.png'>";
 
 			wp_meta();
 			?>
