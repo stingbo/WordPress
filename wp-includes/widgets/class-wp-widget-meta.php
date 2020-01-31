@@ -74,6 +74,8 @@ class WP_Widget_Meta extends WP_Widget {
                 _x( '土豆淘', 'meta widget link text' )
             ), $instance );
 
+            echo '友情链接:<a href="https://www.dappcome.com" title="最专业的Dapp分析平台">DappCome</a><br>';
+
             echo '有问题可以联系博主，联系方式:<br>';
             echo '个人邮箱:<a href="mailto:sting_bo@163.com">sting_bo@163.com</a><br>';
             echo '个人微信二维码:<br>';
